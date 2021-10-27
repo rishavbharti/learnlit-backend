@@ -3,6 +3,7 @@ import { readdirSync } from 'fs';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+
 const logger = require('morgan');
 
 // Create express app
@@ -23,9 +24,7 @@ app.get('/', (req, res) => {
   res.send('API available at /api');
 });
 
-readdirSync('./routes').map((r) => {
-  app.use('/api', require(`./routes/${r}`));
-});
+readdirSync('./routes').map((r) => app.use('/api', require(`./routes/${r}`)));
 
 const PORT = process.env.PORT || 8000;
 

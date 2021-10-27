@@ -12,17 +12,19 @@ const register = async (req, res) => {
 
     if (!email) return res.status(400).send('Email is required.');
 
-    if (!password || password.length < 6)
+    if (!password || password.length < 6) {
       return res
         .status(400)
         .send('Password is required and must be at least 6 characters long.');
+    }
 
-    let userExists = await User.findOne({ email }).exec();
+    const userExists = await User.findOne({ email }).exec();
 
-    if (userExists)
+    if (userExists) {
       return res
         .status(400)
         .send('This email address is already associated with another account.');
+    }
 
     const hashedPassword = await hashPassword(password);
 
@@ -66,16 +68,14 @@ const login = async (req, res) => {
         });
 
         return res.json(user);
-      } else {
-        return res.status(404).send('Please enter a valid password.');
       }
-    } else {
-      return res
-        .status(404)
-        .send(
-          "Couldn't find an account associated with this email address. Please enter a registerd email address."
-        );
+      return res.status(404).send('Please enter a valid password.');
     }
+    return res
+      .status(404)
+      .send(
+        "Couldn't find an account associated with this email address. Please enter a registerd email address."
+      );
   } catch (error) {
     return res.status(400).send('Error. Try again');
   }
