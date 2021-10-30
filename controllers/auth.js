@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '../models/user';
 
-import { hashPassword, comparePassword } from '../utils/auth';
+import { hashPassword } from '../utils/auth';
 
 const register = async (req, res) => {
   try {
@@ -49,7 +49,7 @@ const login = async (req, res) => {
     const user = await User.findOne({ email }).exec();
 
     if (user) {
-      const isPasswordValid = await comparePassword(password, user.password);
+      const isPasswordValid = await user.comparePassword(password);
 
       if (isPasswordValid) {
         const token = jwt.sign(

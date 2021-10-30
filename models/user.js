@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const { Schema } = mongoose;
 
@@ -38,5 +39,9 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
+
+userSchema.methods.comparePassword = function (password) {
+  return bcrypt.compare(password, this.password);
+};
 
 export const User = mongoose.model('User', userSchema);
