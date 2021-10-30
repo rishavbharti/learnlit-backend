@@ -81,4 +81,27 @@ const login = async (req, res) => {
   }
 };
 
-export { register, login };
+const currentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password').exec();
+
+    if (user) {
+      return res.json(user);
+    }
+
+    return res.status(404).send('User not found.');
+  } catch (error) {
+    return res.status(401).json(error);
+  }
+};
+
+const logout = (req, res) => {
+  try {
+    res.clearCookie('token');
+    return res.json('Successfully logged out.');
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { register, login, currentUser, logout };

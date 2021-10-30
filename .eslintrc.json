@@ -33,6 +33,8 @@
     "no-underscore-dangle": "off",
     "import/prefer-default-export": "off",
     "global-require": "off",
-    "import/no-dynamic-require": "off"
+    "import/no-dynamic-require": "off",
+    "consistent-return": "off",
+    "func-names": "off"
   }
 }
