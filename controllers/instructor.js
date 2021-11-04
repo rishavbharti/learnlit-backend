@@ -12,7 +12,7 @@ const addInstructor = async (req, res) => {
       res.status(400).send('Instructor name is required');
     }
 
-    const instructor = new Instructor({ ...req.body });
+    const instructor = new Instructor(req.body);
     await instructor.save();
 
     await User.findByIdAndUpdate(
@@ -28,7 +28,7 @@ const addInstructor = async (req, res) => {
       }
     );
 
-    res.status(200).json(instructor);
+    res.status(201).json(instructor);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
@@ -66,7 +66,7 @@ const makeInstructor = async (req, res) => {
       }
     );
 
-    res.status(200).json(instructor);
+    res.status(201).json(instructor);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
@@ -104,14 +104,10 @@ const updateInstructorProfile = async (req, res) => {
       res.status(400).send('Missing instructor id');
     }
 
-    const instructor = await Instructor.findByIdAndUpdate(
-      id,
-      { ...req.body },
-      {
-        new: true,
-        strict: false,
-      }
-    );
+    const instructor = await Instructor.findByIdAndUpdate(id, req.body, {
+      new: true,
+      strict: false,
+    });
 
     res.status(200).json(instructor);
   } catch (error) {
