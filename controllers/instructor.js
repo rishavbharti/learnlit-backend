@@ -43,12 +43,10 @@ const makeInstructor = async (req, res) => {
     const { name } = req.body;
     let instructorName = '';
 
-    const userProfile = await User.findById(req.user._id);
-
     if (name) {
       instructorName = name;
     } else {
-      instructorName = userProfile.name;
+      instructorName = req.user.name;
     }
 
     const instructor = new Instructor({ ...req.body, name: instructorName });

@@ -26,6 +26,7 @@ const isAdmin = async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (user && user.role.includes('Admin')) {
+      req.user = user;
       next();
     } else {
       throw new Error({ error: "Don't have the required access" });
@@ -41,6 +42,7 @@ const isInstructor = async (req, res, next) => {
     const user = await User.findById(req.user._id).exec();
 
     if (user && user.role.includes('Instructor')) {
+      req.user = user;
       next();
     } else {
       throw new Error({ error: "Don't have the required access" });
