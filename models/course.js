@@ -72,7 +72,7 @@ const courseSchema = new Schema(
       type: [curriculum],
       // required: true
     },
-    postedBy: { type: [ObjectId], ref: 'User', required: true },
+    postedBy: { type: ObjectId, ref: 'User', required: true },
     instructors: { type: [ObjectId], ref: 'Instructor', required: true },
     level: {
       type: String,
