@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '../models/user';
 
-import { hashPassword } from '../utils/auth';
+import { hashPassword } from '../utils';
 
 const register = async (req, res) => {
   try {
@@ -81,20 +81,6 @@ const login = async (req, res) => {
   }
 };
 
-const currentUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select('-password').exec();
-
-    if (user) {
-      return res.json(user);
-    }
-
-    return res.status(404).send('User not found.');
-  } catch (error) {
-    return res.status(401).json(error);
-  }
-};
-
 const logout = (req, res) => {
   try {
     res.clearCookie('token');
@@ -104,4 +90,4 @@ const logout = (req, res) => {
   }
 };
 
-export { register, login, currentUser, logout };
+export { register, login, logout };

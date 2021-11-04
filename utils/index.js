@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-export const hashPassword = async (password) => {
+const hashPassword = async (password) => {
   const saltRounds = 10;
   try {
     const hash = await bcrypt.hash(password, saltRounds);
@@ -9,3 +9,7 @@ export const hashPassword = async (password) => {
     return null;
   }
 };
+
+const createSlug = (title) => title.toLowerCase().trim().replace(/ /g, '-');
+
+export { hashPassword, createSlug };
