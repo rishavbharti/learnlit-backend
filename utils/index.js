@@ -9,7 +9,10 @@ const hashPassword = async (password) => {
     return null;
   }
 };
+const comparePassword = function (hashedPassword, password) {
+  return bcrypt.compare(hashedPassword, password);
+};
 
 const createSlug = (title) => title.toLowerCase().trim().replace(/ /g, '-');
 
-export { hashPassword, createSlug };
+export { hashPassword, comparePassword, createSlug };

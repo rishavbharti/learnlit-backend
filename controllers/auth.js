@@ -2,28 +2,32 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '../models/user';
 
-import { hashPassword } from '../utils';
+import { comparePassword, hashPassword } from '../utils';
 
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name) return res.status(400).send('Name is required.');
+    if (!name)
+      return res.status(400).send({ errorMessage: 'Name is required.' });
 
-    if (!email) return res.status(400).send('Email is required.');
+    if (!email)
+      return res.status(400).send({ errorMessage: 'Email is required.' });
 
     if (!password || password.length < 6) {
-      return res
-        .status(400)
-        .send('Password is required and must be at least 6 characters long.');
+      return res.status(400).send({
+        errorMessage:
+          'Password is required and must be at least 6 characters long.',
+      });
     }
 
     const userExists = await User.findOne({ email }).exec();
 
     if (userExists) {
-      return res
-        .status(400)
-        .send('This email address is already associated with another account.');
+      return res.status(400).send({
+        errorMessage:
+          'This email address is already associated with another account. Try with another email.',
+      });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -32,9 +36,25 @@ const register = async (req, res) => {
 
     await user.save();
 
-    return res.status(200).json({ ok: true });
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    user.password = undefined;
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      // domain: '',
+      secure: process.env.NODE_ENV !== 'development', // Only works on https
+    });
+
+    return res.json({ ...user.toObject({ getters: true }), token });
   } catch (error) {
-    return res.status(400).send('Error. Try again');
+    return res.status(400).send({ errorMessage: error.message });
   }
 };
 
@@ -46,10 +66,10 @@ const login = async (req, res) => {
       return res.status(400).send('Please enter a valid email address.');
     }
 
-    const user = await User.findOne({ email }).exec();
+    const user = await User.findOne({ email }).lean().exec();
 
     if (user) {
-      const isPasswordValid = await user.comparePassword(password);
+      const isPasswordValid = await comparePassword(password, user.password);
 
       if (isPasswordValid) {
         const token = jwt.sign(
@@ -61,23 +81,26 @@ const login = async (req, res) => {
         );
 
         user.password = undefined;
+        user.token = token;
 
         res.cookie('token', token, {
           httpOnly: true,
-          // secure: true, // Only works on https
+          // domain: '',
+          secure: process.env.NODE_ENV !== 'development', // Only works on https
         });
 
         return res.json(user);
       }
-      return res.status(404).send('Please enter a valid password.');
     }
-    return res
-      .status(404)
-      .send(
-        "Couldn't find an account associated with this email address. Please enter a registerd email address."
-      );
+
+    return res.status(404).send({
+      errorMessage:
+        "Sorry, we don't recognize that username or password. You can try again or reset your password",
+    });
   } catch (error) {
-    return res.status(400).send('Error. Try again');
+    return res.status(400).json({
+      errorMessage: error.message,
+    });
   }
 };
 

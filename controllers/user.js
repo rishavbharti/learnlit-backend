@@ -5,10 +5,10 @@ const currentUser = async (req, res) => {
     const user = await User.findById(req.user._id).select('-password').exec();
 
     if (user) {
-      res.json(user);
+      return res.json(user);
     }
 
-    res.status(404).send('User not found.');
+    return res.status(404).send('User not found.');
   } catch (error) {
     res.status(401).json(error);
   }
