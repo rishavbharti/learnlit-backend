@@ -48,22 +48,31 @@ const courseSchema = new Schema(
     slug: { type: String, lowercase: true, unique: true },
     description: {
       type: String,
-      required: true,
+      // required: true,
     },
     highlights: { type: [String] },
     prerequisites: { type: [String] },
     targetAudience: String,
     category: { type: String, required: true },
-    subCategory: { type: String, required: true },
-    language: { type: String, required: true },
-    duration: { type: String, required: true },
+    subCategory: {
+      type: String,
+      // required: true
+    },
+    language: {
+      type: String,
+      // required: true
+    },
+    duration: {
+      type: String,
+      // required: true
+    },
     createdDate: { type: Date },
     updatedDate: { type: Date },
 
     coverImage: {
       type: {},
       default: '/course_cover.svg',
-      required: true,
+      // required: true,
     },
     previewMedia: { type: String },
     resources: { type: {} },
@@ -76,7 +85,7 @@ const courseSchema = new Schema(
     instructors: { type: [ObjectId], ref: 'Instructor', required: true },
     level: {
       type: String,
-      required: true,
+      // required: true,
       enum: ['Beginner', 'Intermediate', 'Expert', 'All Levels'],
     },
     pricing: { type: String, enum: ['Free', 'Paid'] },

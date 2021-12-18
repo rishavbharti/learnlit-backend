@@ -2,6 +2,38 @@ import { Course } from '../models/course';
 import { Instructor } from '../models/instructor';
 import { createSlug } from '../utils';
 
+// @desc    Get course categories
+// @route   GET /course-categories
+// @access  Public
+const getCourseCategories = async (req, res) => {
+  try {
+    return res.status(201).send(require(`../data/courseCategories`));
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
+// @desc    Get taught courses
+// @route   GET /me/taught-courses
+// @access  Private
+const getTaughtCourses = async (req, res) => {
+  try {
+    const instructorId = req.user.toObject().instructorProfile[0];
+
+    const instructor = await Instructor.findById(instructorId);
+    if (!instructor.courses.length) {
+      return res.status(200).json([]);
+    }
+
+    const courses = await Course.findById(instructor.courses);
+    return res.status(200).json(courses);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
 // @desc    Create a new course
 // @route   POST /course
 // @access  Private
@@ -51,7 +83,7 @@ const updateCourse = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-      res.status(400).send('Missing course id');
+      return res.status(400).send('Missing course id');
     }
 
     const course = await Course.findOneAndUpdate(
@@ -61,14 +93,14 @@ const updateCourse = async (req, res) => {
     );
 
     if (!course) {
-      res.status(400).send('Invalid course id');
+      return res.status(400).send('Invalid course id');
     }
 
-    res.status(200).json(course);
+    return res.status(200).json(course);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
   }
 };
 
-export { createCourse, updateCourse };
+export { getCourseCategories, getTaughtCourses, createCourse, updateCourse };

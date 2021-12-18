@@ -36,20 +36,20 @@ const addInstructor = async (req, res) => {
 };
 
 // @desc    Creates an instructor profile. Updates the role of requesting user to "Instructor"
-// @route   POST /api/instructor
+// @route   POST /api/become-instructor
 // @access  Private
 const makeInstructor = async (req, res) => {
   try {
-    const { name } = req.body;
-    let instructorName = '';
+    const user = await User.findById(req.user._id).exec();
 
-    if (name) {
-      instructorName = name;
+    if (user && !user.role.includes('Instructor')) {
+      req.body.name = user.name;
+      req.body.email = user.email;
     } else {
-      instructorName = req.user.name;
+      return res.status(400).json('Already an Instructor');
     }
 
-    const instructor = new Instructor({ ...req.body, name: instructorName });
+    const instructor = new Instructor({ ...req.body });
     await instructor.save();
 
     await User.findByIdAndUpdate(
@@ -66,10 +66,10 @@ const makeInstructor = async (req, res) => {
       }
     );
 
-    res.status(201).json(instructor);
+    return res.status(201).json(instructor);
   } catch (error) {
     console.error(error);
-    res.status(400).json(error);
+    return res.status(400).json(error);
   }
 };
 
@@ -86,10 +86,10 @@ const getInstructorProfile = async (req, res) => {
 
     const instructor = await Instructor.findById(id);
 
-    res.status(200).json(instructor);
+    return res.status(200).json(instructor);
   } catch (error) {
     console.error(error);
-    res.status(400).json(error);
+    return res.status(400).json(error);
   }
 };
 
@@ -109,10 +109,10 @@ const updateInstructorProfile = async (req, res) => {
       strict: false,
     });
 
-    res.status(200).json(instructor);
+    return res.status(200).json(instructor);
   } catch (error) {
     console.error(error);
-    res.status(400).json(error);
+    return res.status(400).json(error);
   }
 };
 
