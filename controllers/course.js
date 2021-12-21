@@ -26,7 +26,7 @@ const getTaughtCourses = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    const courses = await Course.findById(instructor.courses);
+    const courses = await Course.find({ _id: { $in: instructor.courses } });
     return res.status(200).json(courses);
   } catch (error) {
     console.error(error);
@@ -45,7 +45,8 @@ const createCourse = async (req, res) => {
       slug,
     });
 
-    if (titleExists) return res.status(400).send('Title is taken');
+    if (titleExists)
+      return res.status(400).send({ errorMessage: 'Title is taken' });
 
     const course = new Course({
       slug,
@@ -56,7 +57,7 @@ const createCourse = async (req, res) => {
     await course.save();
 
     await Instructor.findByIdAndUpdate(
-      req.user._id,
+      req.user.toObject().instructorProfile[0],
       {
         $addToSet: {
           courses: course._id,
