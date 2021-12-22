@@ -34,6 +34,30 @@ const getTaughtCourses = async (req, res) => {
   }
 };
 
+// @desc    Get course
+// @route   GET /course/:id
+// @access  Public
+const getCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).send({ errorMessage: 'Missing course id' });
+    }
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(400).send({ errorMessage: 'Invalid course id' });
+    }
+
+    return res.status(200).json(course);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
 // @desc    Create a new course
 // @route   POST /course
 // @access  Private
@@ -104,4 +128,10 @@ const updateCourse = async (req, res) => {
   }
 };
 
-export { getCourseCategories, getTaughtCourses, createCourse, updateCourse };
+export {
+  getCourseCategories,
+  getTaughtCourses,
+  getCourse,
+  createCourse,
+  updateCourse,
+};
