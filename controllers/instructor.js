@@ -3,7 +3,7 @@ import { User } from '../models/user';
 
 // @desc    Add new instructor
 // @route   POST /api/instructor/add
-// @access  Private, Admin
+// @access  Private
 const addInstructor = async (req, res) => {
   try {
     const { name } = req.body;
@@ -12,14 +12,16 @@ const addInstructor = async (req, res) => {
       res.status(400).send('Instructor name is required');
     }
 
-    const instructor = new Instructor(req.body);
+    const instructor = new Instructor({ ...req.body, createdBy: req.user._id });
     await instructor.save();
+
+    res.status(201).json(instructor);
 
     await User.findByIdAndUpdate(
       req.user._id,
       {
         $push: {
-          instructorProfile: instructor._id,
+          createdInstructors: instructor._id,
         },
       },
       {
@@ -27,8 +29,6 @@ const addInstructor = async (req, res) => {
         strict: false,
       }
     );
-
-    res.status(201).json(instructor);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
@@ -55,7 +55,7 @@ const makeInstructor = async (req, res) => {
     await User.findByIdAndUpdate(
       req.user._id,
       {
-        $addToSet: {
+        $set: {
           instructorProfile: instructor._id,
           role: 'Instructor',
         },
@@ -116,11 +116,43 @@ const updateInstructorProfile = async (req, res) => {
   }
 };
 
+const getAddedInstructors = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).exec();
+    const userData = user.toObject();
+
+    let instructorIds = [];
+
+    if (
+      !Object.prototype.hasOwnProperty.call(userData, 'createdInstructors') ||
+      !userData.createdInstructors.length
+    ) {
+      instructorIds = [userData.instructorProfile];
+    } else {
+      instructorIds = [
+        userData.instructorProfile,
+        ...userData.createdInstructors,
+      ];
+    }
+
+    const instructors = await Instructor.find({
+      _id: {
+        $in: instructorIds,
+      },
+    });
+    return res.status(200).json(instructors);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
 export {
   addInstructor,
   makeInstructor,
   getInstructorProfile,
   updateInstructorProfile,
+  getAddedInstructors,
 };
 
 /**

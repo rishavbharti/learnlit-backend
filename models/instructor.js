@@ -20,7 +20,7 @@ const instructor = new Schema(
       type: String,
       default: '/avatar.svg',
     },
-    courses: { type: [ObjectId], ref: 'courses' },
+    courses: { type: [ObjectId], ref: 'Course' },
     social: {
       website: String,
       twitter: String,

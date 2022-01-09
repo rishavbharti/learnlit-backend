@@ -1,4 +1,5 @@
 import { Course } from '../models/course';
+import { User } from '../models/user';
 import { Instructor } from '../models/instructor';
 import { createSlug } from '../utils';
 
@@ -19,7 +20,7 @@ const getCourseCategories = async (req, res) => {
 // @access  Private
 const getTaughtCourses = async (req, res) => {
   try {
-    const instructorId = req.user.toObject().instructorProfile[0];
+    const instructorId = req.user.toObject().instructorProfile;
 
     const instructor = await Instructor.findById(instructorId);
     if (!instructor.courses.length) {
@@ -27,6 +28,28 @@ const getTaughtCourses = async (req, res) => {
     }
 
     const courses = await Course.find({ _id: { $in: instructor.courses } });
+    return res.status(200).json(courses);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
+// @desc    Get posted courses
+// @route   GET /me/posted-courses
+// @access  Private
+const getPostedCourses = async (req, res) => {
+  try {
+    const user = req.user.toObject();
+
+    if (
+      !Object.prototype.hasOwnProperty.call(user, 'postedCourses') ||
+      !user.postedCourses.length
+    ) {
+      return res.status(200).json([]);
+    }
+
+    const courses = await Course.find({ _id: { $in: user.postedCourses } });
     return res.status(200).json(courses);
   } catch (error) {
     console.error(error);
@@ -76,15 +99,14 @@ const createCourse = async (req, res) => {
       slug,
       ...req.body,
       postedBy: req.user._id,
-      instructors: req.user.toObject().instructorProfile[0],
     });
     await course.save();
 
-    await Instructor.findByIdAndUpdate(
-      req.user.toObject().instructorProfile[0],
+    await User.findByIdAndUpdate(
+      req.user._id,
       {
         $addToSet: {
-          courses: course._id,
+          postedCourses: course._id,
         },
       },
       {
@@ -121,7 +143,25 @@ const updateCourse = async (req, res) => {
       return res.status(400).send('Invalid course id');
     }
 
-    return res.status(200).json(course);
+    res.status(200).json(course);
+
+    // Expect instructor id in the request body. If it's an array, only use the first id
+    // ToDo: If instructor is updated, remove course id from the existing one
+    if (Object.prototype.hasOwnProperty.call(req.body, 'instructors')) {
+      const instructorId = req.body.instructors[0];
+      await Instructor.findByIdAndUpdate(
+        instructorId,
+        {
+          $addToSet: {
+            courses: course._id,
+          },
+        },
+        {
+          new: true,
+          strict: false,
+        }
+      );
+    }
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
@@ -131,6 +171,7 @@ const updateCourse = async (req, res) => {
 export {
   getCourseCategories,
   getTaughtCourses,
+  getPostedCourses,
   getCourse,
   createCourse,
   updateCourse,
