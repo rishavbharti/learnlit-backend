@@ -15,6 +15,21 @@ const getCourseCategories = async (req, res) => {
   }
 };
 
+// @desc    Get all published courses
+// @route   GET /all-courses
+// @access  Public
+const getAllPublishedCourses = async (req, res) => {
+  try {
+    const courses = await Course.find({
+      published: { $in: true },
+    });
+    return res.status(200).json(courses);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
 // @desc    Get taught courses
 // @route   GET /me/taught-courses
 // @access  Private
@@ -57,21 +72,29 @@ const getPostedCourses = async (req, res) => {
   }
 };
 
-// @desc    Get course
-// @route   GET /course/:id
+// @desc    Get course based on id or slug
+// @route   POST /course
 // @access  Public
 const getCourse = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, slug } = req.body;
 
-    if (!id) {
-      return res.status(400).send({ errorMessage: 'Missing course id' });
+    if (!(id || slug)) {
+      return res.status(400).send({ errorMessage: 'Missing course id/slug' });
     }
 
-    const course = await Course.findById(id);
+    let course;
+
+    if (id) {
+      course = await Course.findById(id);
+    } else if (slug) {
+      course = await Course.findOne({
+        slug,
+      });
+    }
 
     if (!course) {
-      return res.status(400).send({ errorMessage: 'Invalid course id' });
+      return res.status(400).send({ errorMessage: 'Invalid course id/slug' });
     }
 
     return res.status(200).json(course);
@@ -170,6 +193,7 @@ const updateCourse = async (req, res) => {
 
 export {
   getCourseCategories,
+  getAllPublishedCourses,
   getTaughtCourses,
   getPostedCourses,
   getCourse,
