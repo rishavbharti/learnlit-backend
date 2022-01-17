@@ -86,11 +86,11 @@ const getCourse = async (req, res) => {
     let course;
 
     if (id) {
-      course = await Course.findById(id);
+      course = await Course.findById(id).populate('instructors');
     } else if (slug) {
       course = await Course.findOne({
         slug,
-      });
+      }).populate('instructors');
     }
 
     if (!course) {
