@@ -1,5 +1,4 @@
 import { Course } from '../models/course';
-import { User } from '../models/user';
 import { Instructor } from '../models/instructor';
 import { createSlug } from '../utils';
 
@@ -22,7 +21,11 @@ const getAllPublishedCourses = async (req, res) => {
   try {
     const courses = await Course.find({
       published: { $in: true },
-    });
+    })
+      .lean()
+      .populate('instructors', 'name')
+      .select('-meta.enrollments');
+
     return res.status(200).json(courses);
   } catch (error) {
     console.error(error);
@@ -77,7 +80,7 @@ const getPostedCourses = async (req, res) => {
 // @access  Public
 const getCourse = async (req, res) => {
   try {
-    const { id, slug } = req.body;
+    const { userId, id, slug } = req.body;
 
     if (!(id || slug)) {
       return res.status(400).send({ errorMessage: 'Missing course id/slug' });
@@ -86,15 +89,26 @@ const getCourse = async (req, res) => {
     let course;
 
     if (id) {
-      course = await Course.findById(id).populate('instructors');
+      course = await Course.findById(id).populate('instructors').lean();
     } else if (slug) {
       course = await Course.findOne({
         slug,
-      }).populate('instructors');
+      })
+        .lean()
+        .populate('instructors');
     }
 
     if (!course) {
       return res.status(400).send({ errorMessage: 'Invalid course id/slug' });
+    }
+
+    if (userId) {
+      const isUserEnrolled = course.meta.enrollments.find(
+        (_id) => _id.toString() === userId
+      );
+
+      course.isUserEnrolled = Boolean(isUserEnrolled);
+      delete course.meta.enrollments;
     }
 
     return res.status(200).json(course);
@@ -125,18 +139,18 @@ const createCourse = async (req, res) => {
     });
     await course.save();
 
-    await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $addToSet: {
-          postedCourses: course._id,
-        },
-      },
-      {
-        new: true,
-        strict: false,
-      }
-    );
+    // await User.findByIdAndUpdate(
+    //   req.user._id,
+    //   {
+    //     $addToSet: {
+    //       postedCourses: course._id,
+    //     },
+    //   },
+    //   {
+    //     new: true,
+    //     strict: false,
+    //   }
+    // );
 
     res.status(201).json(course);
   } catch (error) {
@@ -154,6 +168,10 @@ const updateCourse = async (req, res) => {
 
     if (!id) {
       return res.status(400).send('Missing course id');
+    }
+
+    if (Object.prototype.hasOwnProperty.call(req.body, 'meta')) {
+      return res.status(400).send('Bad request');
     }
 
     const course = await Course.findOneAndUpdate(

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { User } from './user';
 
 const { Schema } = mongoose;
 
@@ -100,15 +101,38 @@ const courseSchema = new Schema(
     published: { type: Boolean, default: false },
     hidePlayerBranding: { type: Boolean, default: false },
     meta: {
-      enrollments: Number,
+      enrollments: { type: [ObjectId], ref: 'User' },
       rating: Number,
       numberOfRatings: Number,
-      reviews: [{ body: String, date: Date }],
+      reviews: [
+        { body: String, reviewer: { type: ObjectId, ref: 'User' }, date: Date },
+      ],
     },
   },
   {
     timestamps: true,
-  }
+  },
+  { toJSON: { virtuals: true } },
+  { toObject: { virtuals: true } }
 );
+
+courseSchema.virtual('totalEnrollments').get(function () {
+  return this.meta.enrollments.length;
+});
+
+courseSchema.post('save', async (course) => {
+  await User.findByIdAndUpdate(
+    course.postedBy,
+    {
+      $addToSet: {
+        postedCourses: course._id,
+      },
+    },
+    {
+      new: true,
+      strict: false,
+    }
+  );
+});
 
 export const Course = mongoose.model('Course', courseSchema);
