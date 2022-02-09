@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
+const { ObjectId } = Schema;
 
 const userSchema = new Schema(
   {
@@ -33,6 +34,9 @@ const userSchema = new Schema(
     // instructorProfile: { type: ObjectId, ref: 'Instructor' },
     // postedCourses: { type: [ObjectId], ref: 'Course' },
     // createdInstructors: { type: [ObjectId], ref: 'Instructor' },
+    cart: { type: [ObjectId], ref: 'Course' },
+    wishlist: { type: [ObjectId], ref: 'Course' },
+    enrolledCourses: { type: [ObjectId], ref: 'Course' },
     stripe_account_id: '',
     stripe_seller: {},
     stripeSession: {},
