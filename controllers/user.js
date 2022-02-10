@@ -1,4 +1,5 @@
 import { User } from '../models/user';
+import { Course } from '../models/course';
 
 const currentUser = async (req, res) => {
   try {
@@ -173,6 +174,56 @@ const getWishlist = async (req, res) => {
   }
 };
 
+const checkout = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { ids } = req.body;
+
+    if (!_id) {
+      return res.status(400);
+    }
+
+    if (!ids.length) {
+      return res.status(404);
+    }
+
+    const [_, user] = await Promise.all([
+      Course.updateMany(
+        { _id: { $in: ids }, pricing: { $eq: 'Free' } },
+        {
+          $addToSet: {
+            'meta.enrollments': _id,
+          },
+        },
+        {
+          new: true,
+          strict: false,
+        }
+      ).lean(),
+      User.findByIdAndUpdate(
+        _id,
+        {
+          $addToSet: {
+            enrolledCourses: ids,
+          },
+          $pull: { cart: { $in: ids }, wishlist: { $in: ids } },
+        },
+        {
+          new: true,
+          strict: false,
+        }
+      )
+        .lean()
+        .select('cart wishlist enrolledCourses'),
+    ]);
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(401).json(error);
+  }
+};
+
 export {
   currentUser,
   addToCart,
@@ -181,4 +232,5 @@ export {
   addToWishlist,
   getWishlist,
   removeFromWishlist,
+  checkout,
 };
