@@ -5,6 +5,19 @@ const { Schema } = mongoose;
 
 const { ObjectId } = mongoose.Schema;
 
+const enrolledUsers = new Schema(
+  {
+    id: ObjectId,
+  },
+  {
+    _id: false,
+    timestamps: {
+      createdAt: 'enrolledOn',
+      updatedAt: false,
+    },
+  }
+);
+
 const curriculum = new Schema({
   chapterTitle: {
     type: String,
@@ -101,7 +114,7 @@ const courseSchema = new Schema(
     published: { type: Boolean, default: false },
     hidePlayerBranding: { type: Boolean, default: false },
     meta: {
-      enrollments: { type: [ObjectId], ref: 'User' },
+      enrollments: [{ type: enrolledUsers, ref: 'User' }],
       rating: Number,
       numberOfRatings: Number,
       reviews: [

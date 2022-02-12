@@ -3,6 +3,16 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
+const enrolledCourses = new Schema(
+  {
+    course: { type: ObjectId, ref: 'Course' },
+    enrolledOn: Date,
+  },
+  {
+    _id: false,
+  }
+);
+
 const userSchema = new Schema(
   {
     name: {
@@ -36,7 +46,9 @@ const userSchema = new Schema(
     // createdInstructors: { type: [ObjectId], ref: 'Instructor' },
     cart: { type: [ObjectId], ref: 'Course' },
     wishlist: { type: [ObjectId], ref: 'Course' },
-    enrolledCourses: { type: [ObjectId], ref: 'Course' },
+    enrolledCourses: {
+      type: [enrolledCourses],
+    },
     stripe_account_id: '',
     stripe_seller: {},
     stripeSession: {},

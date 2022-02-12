@@ -161,6 +161,7 @@ const getWishlist = async (req, res) => {
       .lean()
       .populate({
         path: 'wishlist',
+        select: '-meta -curriculum',
         populate: {
           path: 'instructors',
           select: 'name',
@@ -179,6 +180,11 @@ const checkout = async (req, res) => {
     const { _id } = req.user;
     const { ids } = req.body;
 
+    const enrolledCourses = ids.map((id) => ({
+      course: id,
+      enrolledOn: new Date().toISOString(),
+    }));
+
     if (!_id) {
       return res.status(400);
     }
@@ -192,7 +198,7 @@ const checkout = async (req, res) => {
         { _id: { $in: ids }, pricing: { $eq: 'Free' } },
         {
           $addToSet: {
-            'meta.enrollments': _id,
+            'meta.enrollments': { id: _id },
           },
         },
         {
@@ -204,7 +210,7 @@ const checkout = async (req, res) => {
         _id,
         {
           $addToSet: {
-            enrolledCourses: ids,
+            enrolledCourses,
           },
           $pull: { cart: { $in: ids }, wishlist: { $in: ids } },
         },
@@ -224,6 +230,22 @@ const checkout = async (req, res) => {
   }
 };
 
+const getEnrolledCourses = async (req, res) => {
+  try {
+    const { _id } = req.user;
+
+    const data = await User.findById(_id)
+      .lean()
+      .populate({ path: 'enrolledCourses.course', select: '-meta -curriculum' })
+      .select('enrolledCourses');
+
+    return res.status(200).send(data.enrolledCourses);
+  } catch (error) {
+    console.error(error);
+    return res.status(401).json(error);
+  }
+};
+
 export {
   currentUser,
   addToCart,
@@ -233,4 +255,5 @@ export {
   getWishlist,
   removeFromWishlist,
   checkout,
+  getEnrolledCourses,
 };
