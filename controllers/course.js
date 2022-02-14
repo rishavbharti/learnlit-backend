@@ -1,6 +1,6 @@
 import { Course } from '../models/course';
 import { Instructor } from '../models/instructor';
-import { createSlug } from '../utils';
+import { createSlug, snakeCaseToTitle } from '../utils';
 
 // @desc    Get course categories
 // @route   GET /course-categories
@@ -24,9 +24,57 @@ const getAllPublishedCourses = async (req, res) => {
     })
       .lean()
       .populate('instructors', 'name')
-      .select('-meta.enrollments');
+      .select('-meta -curriculum');
 
     return res.status(200).json(courses);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
+// @desc    Get categorized courses
+// @route   GET /courses?category=development&subCategory=web-development
+// @access  Public
+const getCategoryCourses = async (req, res) => {
+  try {
+    console.log(req);
+    const { category, subCategory } = req.query;
+
+    const categoryName = category && snakeCaseToTitle(category);
+    const subCategoryName = subCategory && snakeCaseToTitle(subCategory);
+
+    const title = `${subCategoryName || categoryName} Courses`;
+
+    let courses;
+    if (category && !subCategory) {
+      courses = await Course.find({
+        published: { $in: true },
+        category: { $eq: categoryName },
+      })
+        .lean()
+        .populate('instructors', 'name')
+        .select('-meta -curriculum');
+    } else if (!category && subCategory) {
+      courses = await Course.find({
+        published: { $in: true },
+        subCategory: { $eq: subCategoryName },
+      })
+        .lean()
+        .populate('instructors', 'name')
+        .select('-meta -curriculum');
+    } else if (category && subCategory) {
+      courses = await Course.find({
+        published: { $in: true },
+        category: { $eq: categoryName },
+        subCategory: { $eq: subCategoryName },
+      })
+        .lean()
+        .populate('instructors', 'name')
+        .select('-meta -curriculum');
+    }
+
+    return res.status(200).json({ title, courses });
   } catch (error) {
     console.error(error);
     return res.status(400).json(error);
@@ -212,6 +260,7 @@ const updateCourse = async (req, res) => {
 export {
   getCourseCategories,
   getAllPublishedCourses,
+  getCategoryCourses,
   getTaughtCourses,
   getPostedCourses,
   getCourse,
