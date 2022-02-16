@@ -4,6 +4,8 @@ import { User } from '../models/user';
 
 import { comparePassword, hashPassword } from '../utils';
 
+import { interests } from '../data/interests';
+
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -32,7 +34,7 @@ const register = async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
 
-    const user = new User({ name, email, password: hashedPassword });
+    const user = new User({ name, email, password: hashedPassword, interests });
 
     await user.save();
 

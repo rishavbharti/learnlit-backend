@@ -11,6 +11,7 @@ const currentUser = async (req, res) => {
 
     return res.status(404).send('User not found.');
   } catch (error) {
+    console.error(error);
     res.status(401).json(error);
   }
 };

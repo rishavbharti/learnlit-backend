@@ -68,7 +68,6 @@ const courseSchema = new Schema(
     slug: { type: String, lowercase: true, unique: true },
     description: {
       type: String,
-      // required: true,
     },
     highlights: { type: [] },
     prerequisites: { type: [] },
@@ -76,15 +75,12 @@ const courseSchema = new Schema(
     category: { type: String, required: true },
     subCategory: {
       type: String,
-      // required: true
     },
     language: {
       type: String,
-      // required: true
     },
     duration: {
       type: String,
-      // required: true
     },
     createdDate: { type: Date },
     updatedDate: { type: Date },
@@ -92,20 +88,17 @@ const courseSchema = new Schema(
     coverImage: {
       type: {},
       default: '/course_cover.svg',
-      // required: true,
     },
     previewMedia: { type: String },
     resources: { type: {} },
 
     curriculum: {
       type: [curriculum],
-      // required: true
     },
     postedBy: { type: ObjectId, ref: 'User', required: true },
     instructors: { type: [ObjectId], ref: 'Instructor' },
     level: {
       type: String,
-      // required: true,
       enum: ['Beginner', 'Intermediate', 'Expert', 'All Levels'],
     },
     pricing: { type: String, enum: ['Free', 'Paid'] },
@@ -128,6 +121,13 @@ const courseSchema = new Schema(
   { toJSON: { virtuals: true } },
   { toObject: { virtuals: true } }
 );
+
+// courseSchema.index({
+//   title: 'text',
+//   description: 'text',
+//   category: 'text',
+//   subCategory: 'text',
+// });
 
 courseSchema.virtual('totalEnrollments').get(function () {
   return this.meta.enrollments.length;

@@ -49,6 +49,7 @@ const userSchema = new Schema(
     enrolledCourses: {
       type: [enrolledCourses],
     },
+    interests: [String],
     stripe_account_id: '',
     stripe_seller: {},
     stripeSession: {},

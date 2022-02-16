@@ -8,6 +8,7 @@ import {
   getCourse,
   createCourse,
   updateCourse,
+  searchCourses,
 } from '../controllers/course';
 import { authenticate, isInstructor } from '../middlewares';
 
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.get('/all-courses', getAllPublishedCourses);
 router.get('/courses', getCategoryCourses);
+router.get('/courses/search', searchCourses);
 router.get('/course-categories', getCourseCategories);
 router.get('/me/taught-courses', authenticate, isInstructor, getTaughtCourses);
 router.get('/me/posted-courses', authenticate, isInstructor, getPostedCourses);

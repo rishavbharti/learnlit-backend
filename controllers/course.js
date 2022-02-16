@@ -38,15 +38,26 @@ const getAllPublishedCourses = async (req, res) => {
 // @access  Public
 const getCategoryCourses = async (req, res) => {
   try {
-    console.log(req);
-    const { category, subCategory } = req.query;
+    const { query, category, subCategory } = req.query;
+
+    let courses;
+    if (query) {
+      courses = await Course.find({
+        published: { $in: true },
+        $and: [{ $text: { $search: query } }],
+      })
+        .lean()
+        .populate('instructors', 'name')
+        .select('-meta -curriculum');
+
+      return res.status(200).json({ courses });
+    }
 
     const categoryName = category && snakeCaseToTitle(category);
     const subCategoryName = subCategory && snakeCaseToTitle(subCategory);
 
     const title = `${subCategoryName || categoryName} Courses`;
 
-    let courses;
     if (category && !subCategory) {
       courses = await Course.find({
         published: { $in: true },
@@ -257,6 +268,28 @@ const updateCourse = async (req, res) => {
   }
 };
 
+// @desc    Search courses
+// @route   GET /courses/search?query=development
+// @access  Public
+const searchCourses = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const courses = await Course.find({
+      published: { $in: true },
+      $and: [{ $text: { $search: query } }],
+    })
+      .lean()
+      .populate('instructors', 'name')
+      .select('-meta -curriculum');
+
+    return res.status(200).json({ courses });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json(error);
+  }
+};
+
 export {
   getCourseCategories,
   getAllPublishedCourses,
@@ -266,4 +299,5 @@ export {
   getCourse,
   createCourse,
   updateCourse,
+  searchCourses,
 };
