@@ -122,12 +122,11 @@ const courseSchema = new Schema(
   { toObject: { virtuals: true } }
 );
 
-// courseSchema.index({
-//   title: 'text',
-//   description: 'text',
-//   category: 'text',
-//   subCategory: 'text',
-// });
+courseSchema.index({
+  title: 'text',
+  category: 'text',
+  subCategory: 'text',
+});
 
 courseSchema.virtual('totalEnrollments').get(function () {
   return this.meta.enrollments.length;
