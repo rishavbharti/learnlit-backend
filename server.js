@@ -20,7 +20,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://learnlit.vercel.app'],
+    origin: [
+      'http://localhost:3000',
+      'https://learnlit.vercel.app',
+      'https://learnlit.tech',
+    ],
     credentials: true,
   })
 );
