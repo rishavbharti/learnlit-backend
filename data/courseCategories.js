@@ -76,32 +76,32 @@ export const categories = [
       {
         id: 301,
         title: 'User Experience Design',
-        url: '/design/user-experience/',
+        url: '/courses/design/user-experience/',
       },
       {
         id: 302,
         title: 'Web Design',
-        url: '/design/web-design/',
+        url: '/courses/design/web-design/',
       },
       {
         id: 303,
         title: 'Graphic Design and Illustration',
-        url: '/design/graphic-design-and-illustration/',
+        url: '/courses/design/graphic-design-and-illustration/',
       },
       {
         id: 304,
         title: 'Fashion Design',
-        url: '/design/fashion/',
+        url: '/courses/design/fashion/',
       },
       {
         id: 305,
         title: 'Game Design',
-        url: '/design/game/',
+        url: '/courses/design/game/',
       },
       {
         id: 306,
         title: 'Interior Design',
-        url: '/design/interior/',
+        url: '/courses/design/interior/',
       },
     ],
   },
