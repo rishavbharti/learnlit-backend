@@ -16,6 +16,6 @@ const comparePassword = function (hashedPassword, password) {
 const createSlug = (title) => title.toLowerCase().trim().replace(/ /g, '-');
 
 const snakeCaseToTitle = (word) =>
-  word.replace('-', ' ').replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+  word.replaceAll('-', ' ').replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
 
 export { hashPassword, comparePassword, createSlug, snakeCaseToTitle };
