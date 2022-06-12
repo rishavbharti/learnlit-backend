@@ -68,6 +68,113 @@ export const categories = [
       },
     ],
   },
+  {
+    id: 300,
+    title: 'Design',
+    url: '/courses/design/',
+    subCategories: [
+      {
+        id: 301,
+        title: 'User Experience Design',
+        url: '/design/user-experience/',
+      },
+      {
+        id: 302,
+        title: 'Web Design',
+        url: '/design/web-design/',
+      },
+      {
+        id: 303,
+        title: 'Graphic Design and Illustration',
+        url: '/design/graphic-design-and-illustration/',
+      },
+      {
+        id: 304,
+        title: 'Fashion Design',
+        url: '/design/fashion/',
+      },
+      {
+        id: 305,
+        title: 'Game Design',
+        url: '/design/game/',
+      },
+      {
+        id: 306,
+        title: 'Interior Design',
+        url: '/design/interior/',
+      },
+    ],
+  },
+  {
+    title: 'Marketing',
+    url: '/courses/marketing/',
+    subCategories: [
+      {
+        title: 'Digital Marketing',
+        url: '/courses/marketing/digital-marketing/',
+      },
+      {
+        title: 'Search Engine Optimization',
+        url: '/courses/marketing/search-engine-optimization/',
+      },
+      {
+        title: 'Social Media Marketing',
+        url: '/courses/marketing/social-media-marketing/',
+      },
+      {
+        title: 'Branding',
+        url: '/courses/marketing/branding/',
+      },
+      {
+        title: 'Growth Hacking',
+        url: '/courses/marketing/growth-hacking/',
+      },
+    ],
+  },
+  {
+    title: 'Personal Development',
+    url: '/courses/personal-development/',
+    subCategories: [
+      {
+        title: 'Leadership',
+        url: '/courses/personal-development/leadership/',
+      },
+      {
+        title: 'Career Development',
+        url: '/courses/personal-development/career-development/',
+      },
+      {
+        title: 'Personal Productivity',
+        url: '/courses/personal-development/personal-productivity/',
+      },
+    ],
+  },
+  {
+    title: 'Health and Fitness',
+    url: '/courses/health-and-fitness/',
+    subCategories: [
+      {
+        title: 'Fitness',
+        url: '/courses/health-and-fitness/fitness/',
+      },
+      {
+        title: 'Yoga',
+        url: '/courses/health-and-fitness/yoga/',
+      },
+      {
+        title: 'Meditation',
+        url: '/courses/health-and-fitness/meditation/',
+      },
+      {
+        title: 'Nutrition and Diet',
+        url: '/courses/health-and-fitness/nutrition-and-diet/',
+      },
+      {
+        title: 'Mental Health',
+        url: '/courses/health-and-fitness/mental-health/',
+      },
+    ],
+  },
 ];
 
 // {
