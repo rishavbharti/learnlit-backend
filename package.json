@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -r esm api/index.js"
+    "start": "nodemon -r esm api/index.js",
+    "vercel-build": "echo hello"
   },
   "repository": {
     "type": "git",
