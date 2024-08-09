@@ -8,6 +8,8 @@ import { interests } from '../data/interests';
 
 const register = async (req, res) => {
   try {
+    return res.status(503).send({ errorMessage: "Sign-up is disabled temporarily!" });
+    
     const { name, email, password } = req.body;
 
     if (!name)
